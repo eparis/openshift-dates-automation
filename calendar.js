@@ -139,7 +139,7 @@ function createEvents(cal, eventsToCreate) {
       // If start and end time are the same, create an all day event.
 //      cal.createEvent(toCreate.title, toCreate.start, toCreate.end, options)
       cal.createAllDayEvent(toCreate.title, toCreate.start, options)
-    } else if ((toCreate.end.getDate()-toCreate.start.getDate())>0){
+    } else if ((toCreate.end.getTime()-toCreate.start.getTime())/(1000 * 3600 * 24)>0){
       // If it is an event spanning multiple days, create all-day event
       // end-date needs to be adjusted to the next day due to the way google calendar events work.
       toCreate.end.setDate(toCreate.end.getDate() + 1)
@@ -151,6 +151,21 @@ function createEvents(cal, eventsToCreate) {
     }
     //cal.createEvent(toCreate.title, toCreate.start, toCreate.end, options); 
   }
+}
+
+// Test function, it will delete ALL the events created via automation, within the time window. Can be used to force re-create of events when code/logic changes
+function deleteAllEvents() {
+  var cal = CalendarApp.getCalendarById(aosMainCalendarID);
+  var startDate = new Date();
+  // Start from a month ago from today
+  startDate.setMonth(startDate.getMonth() - 1);
+  var endDate = new Date();
+  // End date is a year from today
+  endDate.setYear(endDate.getYear() + 1);
+  var existingCalEvents = getCalendarEvents(cal, startDate, endDate);
+
+  deleteEvents(cal, existingCalEvents);
+
 }
 
 function updateAOSMainCalendar(sched) {
